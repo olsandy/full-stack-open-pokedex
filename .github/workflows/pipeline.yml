@@ -17,6 +17,8 @@ jobs:
         run: npm install
       - name: Install browsers
         run: npx playwright install
+      - name: Install browser dependencies
+        run: sudo npx playwright install-deps
       - name: Check style
         run: npm run eslint
       - name: build
