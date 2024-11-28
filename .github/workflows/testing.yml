@@ -30,3 +30,6 @@ jobs:
         env:
           JOINED_MESSAGES: ${{ join(github.event.commits.*.message, ', ')}}
         run: echo "$JOINED_MESSAGES"
+      - name: print if not contains
+        if: ${{ !contains(join(github.event.commits.*.message, ', '), '#skip') }}
+        run: echo "message does not contain `#skip`!"
