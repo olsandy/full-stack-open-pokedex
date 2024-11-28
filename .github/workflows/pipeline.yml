@@ -48,7 +48,7 @@ jobs:
           DEFAULT_BUMP: patch
       - name: New version of Pokedex deployed!
         uses: rjstone/discord-webhook-notify@v1
-        if: success()
+        if: ${{ success() && github.event_name == 'push' && fromJson(env.noSkip) }}
         with:
           severity: info
           details: Deployment Succeeded!
