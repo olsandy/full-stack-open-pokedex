@@ -1,5 +1,7 @@
 name: Testing stuff
 
+env:
+  hasSkip: ${{ !contains(join(github.event.commits.*.message, ', '), '#skip') }}
 on:
   push:
     branches:
@@ -31,5 +33,5 @@ jobs:
           JOINED_MESSAGES: ${{ join(github.event.commits.*.message, ', ')}}
         run: echo "$JOINED_MESSAGES"
       - name: print if not contains
-        if: ${{ !contains(join(github.event.commits.*.message, ', '), '#skip') }}
+        if: ${{ fromJson(env.hasSkip) }}
         run: echo "message does not contain `#skip`!" # print if msg doesn't have #skip

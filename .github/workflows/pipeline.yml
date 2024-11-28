@@ -1,5 +1,8 @@
 name: Deployment pipeline
 
+env:
+  hasSkip: ${{ !contains(join(github.event.commits.*.message, ', '), '#skip') }}
+
 on:
   push:
     branches:
@@ -31,13 +34,14 @@ jobs:
       - name: test end-2-end
         run: npm run test:e2e
       - name: Trigger deployment
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ github.event_name == 'push' && fromJson(env.hasSkip)}}
         uses: sws2apps/render-deployment@main #consider using pin for dependabot auto update
         with:
           serviceId: ${{ secrets.RENDER_SERVICE_ID }}
           apiKey: ${{ secrets.RENDER_API_KEY }}
           multipleDeployment: false #optional, default true
       - name: Bump version and push tag
+        if: ${{ fromJson(env.hasSkip)}}
         uses: anothrNick/github-tag-action@1.71.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
