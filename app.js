@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 5000
 app.use(express.static('dist'))
 
 app.get('/version', (req, res) => {
-  res.send('1.16') // todo: remove or modify for compatibility with tags
+  res.send('1.17') // todo: remove or modify for compatibility with tags
 })
 
 app.get('/health', (req, res) => {
