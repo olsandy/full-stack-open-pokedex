@@ -29,8 +29,8 @@ jobs:
         run: npm run eslint
       - name: build
         id: build
-        run: build failing
-        # run: npm run build
+        # run: build failing
+        run: npm run build
       - name: test
         run: npm test
       - name: test end-2-end
@@ -62,5 +62,5 @@ jobs:
         with:
           webhook_url: ${{ secrets.DISCORD_WEBHOOK }}
           title: Build failed
-          message: 'commit ${{ github.event.head_commit.url }} by ${{ github.event.pusher.name }} broke the build'
+          message: 'commit ${{ github.event.head_commit.url }} by ${{ github.event.sender.name }} broke the build'
           colour: '#ff0303'
