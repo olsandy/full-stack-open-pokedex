@@ -1,7 +1,7 @@
 name: Deployment pipeline
 
 env:
-  hasSkip: ${{ !contains(join(github.event.commits.*.message, ', '), '#skip') }}
+  noSkip: ${{ !contains(join(github.event.commits.*.message, ', '), '#skip') }}
 
 on:
   push:
@@ -28,21 +28,39 @@ jobs:
       - name: Check style
         run: npm run eslint
       - name: build
+        id: build
+        # run: build failing
         run: npm run build
       - name: test
         run: npm test
       - name: test end-2-end
         run: npm run test:e2e
       - name: Trigger deployment
-        if: ${{ github.event_name == 'push' && fromJson(env.hasSkip)}}
+        if: ${{ github.event_name == 'push' && fromJson(env.noSkip) }}
         uses: sws2apps/render-deployment@main #consider using pin for dependabot auto update
         with:
           serviceId: ${{ secrets.RENDER_SERVICE_ID }}
           apiKey: ${{ secrets.RENDER_API_KEY }}
           multipleDeployment: false #optional, default true
       - name: Bump version and push tag
-        if: ${{ fromJson(env.hasSkip)}}
+        if: ${{ fromJson(env.noSkip) }}
         uses: anothrNick/github-tag-action@1.71.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch
+      - name: New version of Pokedex deployed!
+        if: ${{ success() && github.event_name == 'push' && fromJson(env.noSkip) }}
+        uses: stegzilla/discord-notify@v2
+        with:
+          webhook_url: ${{ secrets.DISCORD_WEBHOOK }}
+          title: New version of Pokedex deployed!
+          message: "to\nhttps://full-stack-open-pokedex-rqf4.onrender.com by ${{ github.event.pusher.name }}"
+          colour: '#45f542'
+      - name: Build failed!
+        if: ${{ failure() && github.event_name == 'push' && steps.build.conclusion == 'failure' }}
+        uses: stegzilla/discord-notify@v2
+        with:
+          webhook_url: ${{ secrets.DISCORD_WEBHOOK }}
+          title: Build failed
+          message: 'commit ${{ github.event.head_commit.url }} by ${{ github.event.sender.name }} broke the build'
+          colour: '#ff0303'
