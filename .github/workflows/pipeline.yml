@@ -28,6 +28,8 @@ jobs:
       - name: Check style
         run: npm run eslint
       - name: build
+        id: build
+        # run: build failing
         run: npm run build
       - name: test
         run: npm test
@@ -47,16 +49,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch
       - name: New version of Pokedex deployed!
-        uses: rjstone/discord-webhook-notify@v1
         if: ${{ success() && github.event_name == 'push' && fromJson(env.noSkip) }}
+        uses: stegzilla/discord-notify@v2
         with:
-          severity: info
-          details: Deployment Succeeded!
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-      - name: Test Failure
-        uses: rjstone/discord-webhook-notify@v1
-        if: ${{ failure() && steps.build.conclusion == 'failure' }}
+          webhook_url: ${{ secrets.DISCORD_WEBHOOK }}
+          title: New version of Pokedex deployed!
+          message: "to\nhttps://full-stack-open-pokedex-rqf4.onrender.com by ${{ github.event.pusher.name }}"
+          colour: '#45f542'
+      - name: Build failed!
+        if: ${{ failure() && github.event_name == 'push' && steps.build.conclusion == 'failure' }}
+        uses: stegzilla/discord-notify@v2
         with:
-          severity: error
-          details: Build Failed!
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          webhook_url: ${{ secrets.DISCORD_WEBHOOK }}
+          title: Build failed
+          message: 'commit ${{ github.event.head_commit.url }} by ${{ github.event.sender.name }} broke the build'
+          colour: '#ff0303'
