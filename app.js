@@ -13,7 +13,8 @@ app.get('/version', (req, res) => {
 app.get('/health', (req, res) => {
   res.send('ok')
 })
-
+// eslint-disable-next-line no-constant-condition
+if (true) throw 'simulating build error...  '
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
   console.log(`server started on port ${PORT}`)
