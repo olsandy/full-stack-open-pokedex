@@ -57,7 +57,7 @@ jobs:
           message: "to\nhttps://full-stack-open-pokedex-rqf4.onrender.com by ${{ github.event.pusher.name }}"
           colour: '#45f542'
       - name: Build failed!
-        if: ${{ failure() && steps.build.conclusion == 'failure' }}
+        if: ${{ failure() && github.event_name == 'push' && steps.build.conclusion == 'failure' }}
         uses: stegzilla/discord-notify@v2
         with:
           webhook_url: ${{ secrets.DISCORD_WEBHOOK }}
