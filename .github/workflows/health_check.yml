@@ -1,3 +1,5 @@
+name: Scheduled Health Check
+
 on:
   schedule:
     - cron: '3/5 * * * *'
